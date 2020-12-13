@@ -18,13 +18,13 @@ Specifically, install docker and docker-compose by apt: `sudo apt install docker
 
 Add current user to docker group: `sudo gpasswd -a ${USER} docker`
 
-Now you are able to run `docker ps` as a non-priviledged user. If you are running within a tmux session, make sure you close all previous tmux windows and restart a new window. If you still cannot continue, restart this server.
+Now you are able to run `docker ps` as a non-priviledged user. If you are running within a tmux session, make sure you close all previous tmux windows and restart a new window. If you still cannot continue, restart your server.
 
-You are suggested to configure the docker source (https://www.jianshu.com/p/405fe33b9032)
+You are suggested to [configure the docker source](https://www.jianshu.com/p/405fe33b9032)
 
 #### Golang
 
-This project uses Go for chaincode (Hyperledger Go SDK) and back-end (Gin framework). Install them following: https://golang.org/doc/install
+This project uses the Go language for chaincode (Hyperledger Go SDK) and back-end (Gin framework). Install them following: https://golang.org/doc/install
 
 Modify the `env.sh` for the go binary path.
 
@@ -39,7 +39,7 @@ Make sure you have finished configuring dependencies.
 
 `cd gin && go run gin.go` - Start the backend server, working at `0.0.0.0:8085`
 
-Now you can access the accounts by sending GET or POST requests, e.g., using `curl`
+Now you can access the accounts by sending GET or POST requests, e.g., using `curl`:
 
 `curl http://localhost:8085/hello` - Display project description
 
@@ -47,11 +47,13 @@ Now you can access the accounts by sending GET or POST requests, e.g., using `cu
 
 `curl http://localhost:8085/createTx -X POST -d "id=123&value=1.00&SenderName=Bank&RecverName=Alice"` - Create a new account with specified fields. Return `Err=""` if successful
 
-`curl http://localhost:8085/queryUser -X POST -d "name=Alice"` - Query the fields of one specified account
+`curl http://localhost:8085/queryUser -X POST -d "name=Alice"` - Query related transactions (either sender or receiver) of one specified account
+
+`curl http://localhost:8085/scoreUser -X POST -d "name=Alice"` - Return the credit score of one account, a simplified algorithm of [FICO rule](https://www.myfico.com/credit-education/whats-in-your-credit-score)
 
 Teardown
 ---
 
-After finishing queries, close the server.
+After finishing queries, kill the server.
 
 After finishing the blockchain testnet, close the network by `./networkDown.sh`

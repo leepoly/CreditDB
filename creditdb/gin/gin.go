@@ -108,7 +108,7 @@ func initWallet() *gateway.Contract {
 }
 
 func listTx(contract *gateway.Contract) ([]map[string]interface{}, error) {
-	result, contractErr := contract.EvaluateTransaction("listLoans")
+	result, contractErr := contract.EvaluateTransaction("ListLoans")
 	if contractErr != nil {
 		fmt.Printf("Failed to evaluate transaction: %s\n", contractErr)
 		return nil, contractErr
@@ -137,8 +137,18 @@ func queryUser(contract *gateway.Contract, username string) ([]map[string]interf
 	return jsonResult, jsonErr
 }
 
+func scoreUser(contract *gateway.Contract, username string) string {
+	result, contractErr := contract.EvaluateTransaction("ScoreUser", username)
+	if contractErr != nil {
+		fmt.Printf("Failed to evaluate transaction: %s\n", contractErr)
+		return contractErr.Error()
+	}
+
+	return string(result[:])
+}
+
 func queryTx(contract *gateway.Contract, ID string) (map[string]interface{}, error) {
-	result, contractErr := contract.EvaluateTransaction("queryLoan", ID)
+	result, contractErr := contract.EvaluateTransaction("QueryLoan", ID)
 	if contractErr != nil {
 		fmt.Printf("Failed to evaluate transaction: %s\n", contractErr)
 		return nil, contractErr
@@ -203,6 +213,14 @@ func main() {
 		}
 	})
 
+	r.POST("/scoreUser", func(c *gin.Context) {
+		username := c.PostForm("name")
+		result := scoreUser(contract, username)
+		c.IndentedJSON(http.StatusOK, gin.H{
+			"Score": result,
+		})
+	})
+
 	r.POST("/queryTx", func(c *gin.Context) {
 		id := c.PostForm("id")
 		jsonResult, err := queryTx(contract, id)
@@ -220,7 +238,7 @@ func main() {
 		valueStr := c.PostForm("value")
 		valueFloat64, _ := strconv.ParseFloat(valueStr, 32)
 		SenderName := c.DefaultPostForm("SenderName", "defaultsender")
-		RecverName := c.DefaultPostForm("Recvername", "defaultrecver")
+		RecverName := c.DefaultPostForm("RecverName", "defaultrecver")
 		currentTime := time.Now().Format("01-02-2006 15:04:05")
 		result := createTx(contract, id, valueFloat64, SenderName, RecverName, currentTime)
 		c.IndentedJSON(http.StatusOK, gin.H{

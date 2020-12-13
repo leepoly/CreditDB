@@ -1,4 +1,5 @@
 **/go.sum
 env.sh
 fabcar/gin/wallet/
+creditdb/gin/wallet/
 

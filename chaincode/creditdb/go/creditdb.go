@@ -144,6 +144,69 @@ func (s *SmartContract) QueryUser(ctx contractapi.TransactionContextInterface, Q
 	return results, nil
 }
 
+// ScoreUser returns the estimated score according to the FICO rule
+// ref: https://www.dealmoon.com/guide/762096
+func (s *SmartContract) ScoreUser(ctx contractapi.TransactionContextInterface, QueryName string) string {
+	startKey := ""
+	endKey := ""
+	resultsIterator, err := ctx.GetStub().GetStateByRange(startKey, endKey)
+
+	if err != nil {
+		return err.Error()
+	}
+	defer resultsIterator.Close()
+
+	loanHisScore := 350
+	loanLenScore := 300
+	loanHisLenScore := 0
+	loanBankNumScore := 0
+	loanBankList := map[string]bool{}
+	loanRecentAccountScore := 0
+	tmpItem := 0
+
+	for resultsIterator.HasNext() {
+		queryResponse, err := resultsIterator.Next()
+
+		if err != nil {
+			return err.Error()
+		}
+
+		loan := new(Loan)
+		_ = json.Unmarshal(queryResponse.Value, loan)
+
+		if loan.RecverName == QueryName {
+			tmpItem, _ = strconv.Atoi(loan.Value)
+			loanHisScore -= tmpItem
+			loanLenScore -= int(tmpItem / 2)
+		}
+		if loan.SenderName == QueryName {
+			tmpItem, _ = strconv.Atoi(loan.Value)
+			loanHisScore += tmpItem
+			loanHisLenScore += 10
+			loanBankList[loan.RecverName] = true
+		}
+	}
+	if loanHisScore < 0 {
+		loanHisScore = 0
+	}
+	if loanLenScore < 0 {
+		loanHisScore = 0
+	}
+	if loanHisLenScore > 150 {
+		loanHisLenScore = 150
+	}
+	loanBankNumScore = len(loanBankList) * 10;
+	if loanBankNumScore > 100 {
+		loanBankNumScore = 100
+	}
+	if loanRecentAccountScore > 100 {
+		loanRecentAccountScore = 100
+	}
+	score := loanHisScore + loanLenScore + loanHisLenScore + loanBankNumScore + loanRecentAccountScore
+
+	return strconv.Itoa(score)
+}
+
 func main() {
 	chaincode, err := contractapi.NewChaincode(new(SmartContract))
 
