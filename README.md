@@ -41,6 +41,13 @@ Make sure you have finished configuring dependencies.
 
 Now you can access the accounts by sending GET or POST requests, e.g., using `curl`:
 
+Frontend
+---
+
+Both a Django server for light-weight web rendering and an even lighter terminal util have been established as front-ends.
+
+### For terminal tool curl
+
 `curl http://localhost:8085/hello` - Display project description
 
 `curl http://localhost:8085/listTx` - Show all accounts in Json array format
@@ -50,6 +57,12 @@ Now you can access the accounts by sending GET or POST requests, e.g., using `cu
 `curl http://localhost:8085/queryUser -X POST -d "name=Alice"` - Query related transactions (either sender or receiver) of one specified account
 
 `curl http://localhost:8085/scoreUser -X POST -d "name=Alice"` - Return the credit score of one account, a simplified algorithm of [FICO rule](https://www.myfico.com/credit-education/whats-in-your-credit-score)
+
+### For Django server
+
+`cd frontend`
+
+Launch the server by `python3 ./manage.py runserver 0.0.0.0:8086`. View from your web browser.
 
 Teardown
 ---

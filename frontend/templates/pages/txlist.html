@@ -1,0 +1,32 @@
+{% extends '_base.html' %}
+{% load static %}
+
+{% block title %}Transaction list{% endblock title %}
+
+{% block content %}
+
+<table class="table table-striped">
+    <caption>Transaction List</caption>
+    <thead>
+        <tr>
+            <th>TxID</th>
+            <th>Sender Name</th>
+            <th>Recver Name</th>
+            <th>Timestamp</th>
+            <th>Value</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for Tx in TxList %}
+        <tr>
+            <th>{{ Tx.Key }}</th>
+            <th>{{ Tx.Record.sendername }}</th>
+            <th>{{ Tx.Record.recvername }}</th>
+            <th>{{ Tx.Record.timestamp }}</th>
+            <th>{{ Tx.Record.value }}</th>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock content %}
