@@ -1,59 +1,73 @@
 from django.views.generic import TemplateView
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.contrib import messages
 from django.http import HttpResponse, HttpResponseRedirect
-import requests
 from django.urls import reverse
+from .models import *
 
-
-class HomePageView(TemplateView):
-    template_name = "pages/home.html"
-
-gin_addr = "http://localhost:8085"
+def HomePageView(request):
+    context = checkLogin(request)
+    return render(request, "pages/home.html", context)
 
 def AboutPageView(request):
     r = requests.get(gin_addr + "/hello")
     context = r.json()
+    context.update(checkLogin(request))
     return render(request, "pages/about.html", context)
 
 def ListTransaction(request):
-    r = requests.get(gin_addr + "/listTx")
     context = {}
-    context["TxList"] = r.json()
+    context.update(checkLogin(request))
+    if "user_is_authenticated" in context:
+        context.update(AcquireScore(request, context["user_name"]))
+    context.update(AcquireAllTx(request))
+    context["display_gist"] = True
     # print(context)
     return render(request, "pages/txlist.html", context)
 
-def MaxTxId():
-    r = requests.get(gin_addr + "/listTx")
-    tx_list = r.json()
-    max_id = 0
-    for tx_item in tx_list:
-        id_i = int(tx_item["Key"].replace("TX", ""))
-        if id_i > max_id:
-            max_id = id_i
-    return max_id
-
 def CreateTxView(request):
-    return render(request, "pages/createtx.html", {})
+    context = checkLogin(request)
+    return render(request, "pages/createtx.html", context)
 
-def ListRelatedTxView(request):
-    return render(request, "pages/login.html", {})
+def LoginView(request):
+    context = checkLogin(request)
+    return render(request, "pages/login.html", context)
+
+def AuthUser(request):
+    err_context = {}
+    if request.POST:
+        name = request.POST["name"]
+        key = request.POST["key"]
+        if ValidateKey(name, key):
+            context = {}
+            context["user_is_authenticated"] = True
+            context["user_name"] = name
+            context.update(AcquireRelatedTx(request, name))
+            context.update(AcquireScore(request, name))
+            rep = render(request, "pages/txlist.html", context)
+            rep.set_cookie("login_username", name)
+            return rep
+        else:
+            err_context["err"] = "Please check your name and key"
+    else:
+        err_context["err"] = "Incorrect parameters"
+    return render(request, "pages/login.html", err_context)
 
 def ListRelatedTx(request):
-    post_data = {}
-    if request.POST:
-        post_data["name"] = request.POST["name"]
-        context = {}
-        r = requests.post(gin_addr + "/queryUser", data=post_data)
-        context["TxList"] = r.json()
-        return render(request, "pages/txlist.html", context)
+    context = {}
+    context.update(checkLogin(request))
+    if "user_is_authenticated" in context:
+        context.update(AcquireRelatedTx(request, context["user_name"]))
+        context.update(AcquireScore(request, context["user_name"]))
+        rep = render(request, "pages/txlist.html", context)
+        return rep
     return HttpResponseRedirect(reverse("home"))
 
 def CreateTx(request):
     post_data = {}
     txid = MaxTxId()
     if request.POST:
-        post_data["SenderName"] = request.POST["identity"]
+        post_data["SenderName"] = request.COOKIES.get("login_username")
         post_data["RecverName"] = request.POST["recvername"]
         post_data["value"] = request.POST["value"]
         post_data["id"] = txid + 1
@@ -61,4 +75,9 @@ def CreateTx(request):
         result = response.json()
         messages.error(request, result["Err"])
 
-    return HttpResponseRedirect(reverse("txlist"))
+    return HttpResponseRedirect(reverse("checkmytx"))
+
+def Logout(request):
+    rep = redirect(reverse("home"))
+    rep.delete_cookie("login_username")
+    return rep

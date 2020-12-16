@@ -9,6 +9,9 @@
 <meta name="description" content="A framework for launching new Django projects quickly.">
 <meta name="author" content="">
 <link rel="shortcut icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}">
+<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
 {% block css %}
 <!-- Bootstrap CSS -->
@@ -25,25 +28,35 @@
         <a href="{% url 'home' %}">CreditDB</a>
       </h5>
       <nav class="my-2 my-md-0 mr-md-3">
-        {% if user.is_authenticated %}
-        <ul class="navbar-nav ml-auto">
-          <li class="nav-item">
-            <a class="nav-link dropdown-toggle" href="#" id="userMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              {{ user.email }}
+        {% if user_is_authenticated %}
+        <!-- <ul class="navbar-nav ml-auto">
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="userMenu" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              {{ user_name }}
             </a>
             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userMenu">
-              <a class="dropdown-item" href="{% url 'account_change_password' %}">Change password</a>
+              <a class="dropdown-item" href="{% url 'checkmytx' %}">Check My Transactions</a>
+              <a class="dropdown-item" href="{% url 'createtx' %}">CreateTx</a>
               <div class="dropdown-divider"></div>
-              <a class="dropdown-item" href="{% url 'account_logout' %}">Log out</a>
+              <a class="dropdown-item" href="{% url 'logout' %}">Log out</a>
             </div>
           </li>
-        </ul>
+        </ul> -->
+        <!-- The above menu does not work, wierd... -->
+        <form class="form-inline ml-auto">
+          <a class="nav-link dropdown-toggle" href="{% url 'checkmytx' %}" id="userMenu" aria-haspopup="true" aria-expanded="false">
+            {{ user_name }}
+          </a>
+          <a href="{% url 'about' %}" class="btn btn-outline-secondary">About</a>
+          <a href="{% url 'txlist' %}" class="btn btn-primary ml-2">TxList</a>
+          <a href="{% url 'createtx' %}" class="btn btn-primary ml-2">CreateTx</a>
+          <a href="{% url 'logout' %}" class="btn btn-primary ml-2">Log out</a>
+        </form>
         {% else %}
         <form class="form-inline ml-auto">
           <a href="{% url 'about' %}" class="btn btn-outline-secondary">About</a>
           <a href="{% url 'txlist' %}" class="btn btn-primary ml-2">TxList</a>
           <a href="{% url 'login' %}" class="btn btn-primary ml-2">Login</a>
-          <a href="{% url 'createtx' %}" class="btn btn-primary ml-2">CreateTx</a>
         </form>
         {% endif %}
       </nav>
