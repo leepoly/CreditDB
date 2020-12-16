@@ -54,3 +54,8 @@ def ValidateKey(name, key) -> bool:
     correct_key = base64.b64encode(name_bytes).decode("utf-8")
     print("correctkey:{} key:{}".format(correct_key, key))
     return correct_key == key
+
+def AcquireKey(name):
+    name_bytes = name.encode("utf-8")
+    correct_key = base64.b64encode(name_bytes).decode("utf-8")
+    return correct_key

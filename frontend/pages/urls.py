@@ -12,4 +12,6 @@ urlpatterns = [
     path('auth/', AuthUser),
     path('login/', LoginView, name='login'),
     path('logout/', Logout, name='logout'),
+    path('signup/', SignupView, name='signup'),
+    path('processsignup/', ProcessSignup),
 ]

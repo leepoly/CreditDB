@@ -64,20 +64,53 @@ def ListRelatedTx(request):
     return HttpResponseRedirect(reverse("home"))
 
 def CreateTx(request):
-    post_data = {}
     txid = MaxTxId()
     if request.POST:
-        post_data["SenderName"] = request.COOKIES.get("login_username")
-        post_data["RecverName"] = request.POST["recvername"]
+        post_data = {}
+        post_data["SenderName"] = request.POST["getloanfrom"]
+        post_data["RecverName"] = request.COOKIES.get("login_username")
         post_data["value"] = request.POST["value"]
         post_data["id"] = txid + 1
         response = requests.post(gin_addr + "/createTx", data=post_data)
         result = response.json()
-        messages.error(request, result["Err"])
+        err = result["Err"]
+        if len(err)>0:
+            err_context = {}
+            err_context["err"] = err
+            rep = render(request, "pages/txlist.html", err_context)
+            return rep
 
     return HttpResponseRedirect(reverse("checkmytx"))
 
 def Logout(request):
     rep = redirect(reverse("home"))
     rep.delete_cookie("login_username")
+    return rep
+
+def SignupView(request):
+    context = {}
+    context["signup"] = True
+    context["err"] = "To sign up, you should make a transaction to our assigned accounts, then you will receive your personal key"
+    return render(request, "pages/signup.html", context)
+
+def ProcessSignup(request):
+    txid = MaxTxId()
+    err_context = {}
+    if request.POST:
+        post_data = {}
+        name = request.POST["identity"]
+        post_data["SenderName"] = name
+        post_data["RecverName"] = "ProfXuTHU"
+        post_data["value"] = "0.01"
+        post_data["id"] = txid + 1
+        response = requests.post(gin_addr + "/createTx", data=post_data)
+        result = response.json()
+        err = result["Err"]
+        if len(err)>0:
+            err_context["err"] = err
+        else:
+            err_context["err"] = "Sign up successfully. Your key: \'" + AcquireKey(name) + "\'. Now please login with your identity."
+    else:
+        err_context["err"] = "Incorrect parameters"
+    rep = render(request, "pages/signup.html", err_context)
     return rep
