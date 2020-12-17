@@ -21,11 +21,11 @@
         <tr>
             <th>{{ Tx.Key }}</th>
             {% if display_gist %}
-              <th>{{ Tx.Record.sendername|truncatechars:2 }}</th>
-              <th>{{ Tx.Record.recvername|truncatechars:2 }}</th>
+            <th>{{ Tx.Record.sendername|truncatechars:2 }}</th>
+            <th>{{ Tx.Record.recvername|truncatechars:2 }}</th>
             {% else %}
-              <th>{{ Tx.Record.sendername }}</th>
-              <th>{{ Tx.Record.recvername }}</th>
+            <th>{{ Tx.Record.sendername }}</th>
+            <th>{{ Tx.Record.recvername }}</th>
             {% endif %}
             <th>{{ Tx.Record.timestamp }}</th>
             <th>{{ Tx.Record.value }}</th>
@@ -35,13 +35,41 @@
 </table>
 
 {% if user_is_authenticated %}
-    <div class="progress progress-striped active">
-        <div class="progress-bar progress-bar-success" role="progressbar"
-            aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"
-            style="width: {{ normalizedCreditScore }}%;">
-        </div>
+<div class="progress progress-striped active">
+    <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="60" aria-valuemin="0"
+        aria-valuemax="100" style="width: {{ normalizedCreditScore }}%;">
     </div>
-    <p>My credit score: {{ creditScore }}/1000</p>
+</div>
+<p>My credit score: {{ creditScore }}/1000</p>
 {% endif %}
+
+<div id="tx_chart" style="height: 300px"></div>
+<script type="text/javascript">
+    var myChart = echarts.init(document.getElementById('tx_chart'));
+    var option = {
+        title:{
+            text:'Transaction Trends',
+            x:'center'
+        },
+        tooltip:{},
+        legend:{
+            data:['value'],
+            x:'right'
+        },
+        xAxis:{
+            data: [{% for Tx in TxList %} '{{ Tx.Key }}', {% endfor %}]
+        },
+        yAxis:{},
+        series:[{
+            name:'value',
+            type:'line',
+            smooth: true,
+            data:[
+                {% for Tx in TxList %} {{ Tx.Record.value }}, {% endfor %}
+            ]
+        }]
+    };
+    myChart.setOption(option);
+</script>
 
 {% endblock content %}
