@@ -5,7 +5,11 @@
 
 {% block content %}
 <div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
-  <img src="{% static 'images/Cryptocurrency_logos.jpg' %}" class="img-fluid" alt="DjangoX logo"/>
+  <img src="{% static 'images/Cryptocurrency_logos.jpg' %}" class="img-fluid" alt="logo"/>
   <p class="lead">CreditDB: A decentralized personal credit database system</p>
+  <div class="text-center">
+      <a href="{% url 'signup' %}" class="btn btn-primary ml-2">Sign up</a>
+      <a href="{% url 'about' %}" class="btn btn-outline-secondary ml-2">About</a>
+  </div>
 </div>
 {% endblock content %}
