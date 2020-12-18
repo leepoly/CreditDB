@@ -8,8 +8,12 @@
   <img src="{% static 'images/Cryptocurrency_logos.jpg' %}" class="img-fluid" alt="logo"/>
   <p class="lead">CreditDB: A decentralized personal credit database system</p>
   <div class="text-center">
-      <a href="{% url 'signup' %}" class="btn btn-primary ml-2">Sign up</a>
-      <a href="{% url 'about' %}" class="btn btn-outline-secondary ml-2">About</a>
+    {% if user_is_authenticated %}
+    <a href="{% url 'checkmytx' %}" class="btn btn-primary ml-2">Check My Transactions</a>
+    {% else %}
+    <a href="{% url 'signup' %}" class="btn btn-primary ml-2">Sign up</a>
+    {% endif %}
+    <a href="{% url 'about' %}" class="btn btn-outline-secondary ml-2">About</a>
   </div>
 </div>
 {% endblock content %}

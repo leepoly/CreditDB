@@ -5,6 +5,39 @@
 
 {% block content %}
 
+<script>
+    let mediaStreamTrack=null; // 视频对象(全局)
+    function openMedia() {
+        let constraints = {
+            video: { width: 200, height: 200 },
+            audio: false
+        };
+        //获得video摄像头
+        let video = document.getElementById('video');
+        let promise = navigator.mediaDevices.getUserMedia(constraints);
+        promise.then((mediaStream) => {
+            mediaStreamTrack = typeof mediaStream.stop === 'function' ? mediaStream : mediaStream.getTracks()[1];
+            video.srcObject = mediaStream;
+            video.play();
+        });
+    }
+
+    // 拍照
+    function takePhoto() {
+        //获得Canvas对象
+        let video = document.getElementById('video');
+        let canvas = document.getElementById('canvas');
+        let ctx = canvas.getContext('2d');
+        ctx.drawImage(video, 0, 0, 200, 200);
+        let img = document.getElementById('canvas').toDataURL("image/png");
+        video.style = "display: none";
+        document.getElementById('imgEnc').value = img;
+        // alert(img);
+        document.getElementById('submit').style = "";
+        mediaStreamTrack.stop();
+    }
+</script>
+
 <form class="form-horizontal" role="form" action="/auth/" method="post">
     {% csrf_token %}
     <div class="form-group">
@@ -18,8 +51,17 @@
         <div class="col-sm-10">
         <input type="text" class="form-control" name="key" placeholder="">
         </div>
+        <input type="text" class="form-control" name="imgEnc" id="imgEnc" value="" style="display: none;">
     </div>
-    <div class="form-group">
+
+    <div id="container" style="position:relative; padding-bottom: 200px;">
+        <video id="video" width="200px" height="200px" autoplay="autoplay" style="border-radius: 50%; position:absolute; top:0; left: 40%;"></video>
+        <canvas id="canvas" width="200px" height="200px" style="border-radius: 50%; position:absolute; top:0; left: 40%;"></canvas>
+    </div>
+    <a onclick="openMedia()" class="btn btn-primary ml-2">Enable camera</a>
+    <a onclick="takePhoto()" class="btn btn-primary ml-2">Take a shot</a>
+
+    <div class="form-group" style="padding-top: 30px;">
         <div class="col-sm-offset-2 col-sm-10">
         <button type="submit" class="btn btn-success">Login</button>
         </div>

@@ -38,7 +38,15 @@ def AuthUser(request):
     if request.POST:
         name = request.POST["name"]
         key = request.POST["key"]
-        if ValidateKey(name, key):
+        imgEnc = request.POST["imgEnc"]
+        face_rec_name = SearchFace(imgEnc)
+        validated = False
+        if len(face_rec_name) > 0:
+            name = face_rec_name
+            validated = True
+        else:
+            validated = ValidateKey(name, key)
+        if validated:
             context = {}
             context["user_is_authenticated"] = True
             context["user_name"] = name
@@ -99,14 +107,20 @@ def ProcessSignup(request):
     if request.POST:
         post_data = {}
         name = request.POST["identity"]
-        post_data["SenderName"] = name
-        post_data["RecverName"] = "ProfXuTHU"
-        post_data["value"] = "0.01"
-        post_data["id"] = txid + 1
-        response = requests.post(gin_addr + "/createTx", data=post_data)
-        result = response.json()
-        err = result["Err"]
-        if len(err)>0:
+        imgEnc = request.POST["imgEnc"]
+        err = ""
+        if imgEnc:
+            if not AppendFace(name, imgEnc):
+                err = "Append face fails. Please retake."
+        if len(err) == 0:
+            post_data["SenderName"] = name
+            post_data["RecverName"] = "ProfXuTHU"
+            post_data["value"] = "0.01"
+            post_data["id"] = txid + 1
+            response = requests.post(gin_addr + "/createTx", data=post_data)
+            result = response.json()
+            err = result["Err"]
+        if len(err) > 0:
             err_context["err"] = err
         else:
             err_context["err"] = "Sign up successfully. Your key: \'" + AcquireKey(name) + "\'. Now please login with your identity."
