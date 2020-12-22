@@ -5,7 +5,7 @@ import base64
 # Create your models here.
 
 gin_addr = "http://localhost:8085"
-facesdk_access_token="24.33628c4663de606d40dde35a1431ee5a.2592000.1610804750.282335-23172525"
+facesdk_access_token="***REMOVED***"
 facesdk_search_url = "https://aip.baidubce.com/rest/2.0/face/v3/search"
 facesdk_add_url = "https://aip.baidubce.com/rest/2.0/face/v3/faceset/user/add"
 
