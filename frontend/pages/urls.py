@@ -14,4 +14,5 @@ urlpatterns = [
     path('logout/', Logout, name='logout'),
     path('signup/', SignupView, name='signup'),
     path('processsignup/', ProcessSignup),
+    path('.well-known/pki-validation/9397C7D639E184C70EB8B7F709355471.txt', HttpsAuth), # for https cert auth
 ]

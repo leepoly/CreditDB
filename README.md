@@ -62,11 +62,13 @@ Both a Django server for light-weight web rendering and an even lighter terminal
 
 `cd frontend`
 
-Launch the server by `python3 ./manage.py runserver 0.0.0.0:8086`. View from your web browser.
+Launch the unencrypted server by `./starthttp.sh`. View it from your web browser: `http://[ip-addr]:8086/`. Note that latest browser (e.g. Chrome, Edge) does not allow camera under http protocol. Specific site configuration is needed.
+
+Or, launch the encrypted server by `./starthttps.sh`. View it from your web browser: `https://[ip-addr]:8086/`.
 
 Teardown
 ---
 
-After finishing queries, kill the server.
+After finishing queries, kill the server: `ctrl-c`.
 
 After finishing the blockchain testnet, close the network by `./networkDown.sh`

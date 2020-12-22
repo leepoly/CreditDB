@@ -101,6 +101,9 @@ def SignupView(request):
     context["err"] = "To sign up, you should make a transaction to our assigned accounts, then you will receive your personal key"
     return render(request, "pages/signup.html", context)
 
+def HttpsAuth(request):
+    return render(request, ".well-known/pki-validation/9397C7D639E184C70EB8B7F709355471.txt")
+
 def ProcessSignup(request):
     txid = MaxTxId()
     err_context = {}
